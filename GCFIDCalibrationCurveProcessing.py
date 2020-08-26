@@ -64,13 +64,19 @@ data.columns=['Name','IMeOH','IPhenol','IPhenylFormate','IDodecane','nMeOH','nPh
 a = data.values
 
 function = []
-for i in range(3):
+for i in range(len(PeakList.keys())-1):
     x = (a[:,i+1]/a[:,4]).astype(float)
     y = (a[:,i+5]/AmmountIS).astype(float)
     function.append(np.polyfit(x,y,1))
     
 Regression = pd.DataFrame(function)
-Regression.columns = ['a','b']
+Name = pd.DataFrame(PeakList.keys())
+Name = Name.iloc[0:len(PeakList.keys())-1:,]
+Regression.insert(0,'Name',Name)
+
+Regression.columns = ['Name','a','b']
+
+
      
-Regression.to_csv(r'C:\Users\Magnu\Nextcloud\PostDOC\ElectrochemicalHydrogenation\MS\CalibrationCurve.csv')
-data.to_csv(r'C:\Users\Magnu\Nextcloud\PostDOC\ElectrochemicalHydrogenation\MS\CalibrationData.csv')
+Regression.to_csv(r'C:\Users\Magnu\Nextcloud\PostDOC\ElectrochemicalHydrogenation\MS\CalibrationCurve.csv', index = False)
+data.to_csv(r'C:\Users\Magnu\Nextcloud\PostDOC\ElectrochemicalHydrogenation\MS\CalibrationData.csv', index = False)
