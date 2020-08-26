@@ -60,18 +60,19 @@ for i in files:
     ### Calculate ammount of each file and compound
     AreaList.append(nDodecane*(CC['a'][0]*intList[0]/intList[-1]+CC['b'][0]))
     AreaList.append(nDodecane*(CC['a'][1]*intList[1]/intList[-1]+CC['b'][1]))
-    AreaList.append(nDodecane*(CC['a'][3+b]*intList[3+b]/intList[-1]+CC['b'][3+b]))
+    AreaList.append(nDodecane*(CC['a'][2+b]*intList[3+b]/intList[-1]+CC['b'][2+b]))
       
     AreaList.append(intList[3]/intList[-1])
                
-    AreaList.append(AreaList[1]/Scale)
+    AreaList.append(AreaList[1]/Scale*100)
     AreaList.append((Scale-AreaList[3])/Scale*100)
 
     
     data = data + [AreaList]
     
     #Plot
-    plt.plot(df['rt'],df['y'])
+    plt.plot(df['rt'],df['y'],label=FileName)
+plt.legend(loc='best')
 
     
 data = pd.DataFrame(data)
