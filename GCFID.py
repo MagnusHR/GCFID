@@ -18,12 +18,14 @@ nDodecane = 0.05218106#Dodecane*0.75/170.33
 
 #List of start and end points of peaks
 #Format: Name, Starting point for integration, End point for integration, Starting Point for Background, End Point for Background,Last end poitn for Integration
-PeakList = {'MeOH' : [1.415, 1.46, 1.4, 1.51, 1.51 ],
-    'Phenol' : [5.78, 5.92, 5.5, 6.2, 5.87],
-    'PhenylFormate' : [5.92, 6.0, 5.831, 6.2, 6.2],
-    'Dodecane' : [6.98, 7.05, 6.9, 7.15, 7.15],
+PeakList = {'MeOH' : [1.415, 1.46, 1.4, 1.51, 1.47 ],
+    'MethylFormate': [1.47, 1.50, 1.46, 1.507, 1.505],            
+    'Phenol' : [5.78, 5.92, 5.5, 6.2, 5.87],    
     'Mystery': [1.34, 1.40, 1.3, 1.42, 1.42],
-    'MethylFormate': [1.47, 1.50, 1.46, 1.507, 1.505]
+    'TFEFormate' : [1.509, 1.55, 1.502, 1.56, 1.56],
+    'PhenylFormate' : [5.92, 6.0, 5.831, 6.2, 6.2],
+    'iPrFormate' : [1.885, 1.95, 1.85, 2.0, 2.0],
+    'Dodecane' : [6.98, 7.05, 6.9, 7.15, 7.15]
     }
 
 ### File for storing calibration curve data
@@ -37,6 +39,9 @@ DataFile = r'C:\Users\Magnu\Nextcloud\PostDOC\ElectrochemicalHydrogenation\MS\Da
 fileRegex = re.compile(r'(.+\/)(.+)(\.CSV)')
 files = TKinterImport.importData()
 
+b = input('What is the starting Ester?  "1" for TFEFormate, "2" for PhenylFormate, "3" for iPrFormate: ')
+b = int(b)
+
 
 plt.figure(figsize=(7,4))
 data=[]
@@ -48,16 +53,19 @@ for i in files:
         
     ### Background and integration
     AreaList = [FileName]
+    intList = []
     for keys in PeakList:
-        AreaList.append(BaselineAndArea.FindArea(df,PeakList[keys]))
+        intList.append(BaselineAndArea.FindArea(df,PeakList[keys]))
     
     ### Calculate ammount of each file and compound
-    AreaList.append(nDodecane*(CC['a'][0]*AreaList[1]/AreaList[4]+CC['b'][0]))
-    AreaList.append(nDodecane*(CC['a'][1]*AreaList[2]/AreaList[4]+CC['b'][1]))
-    AreaList.append(nDodecane*(CC['a'][2]*AreaList[3]/AreaList[4]+CC['b'][2]))
-                    
-    AreaList.append(AreaList[7]/Scale)
-    AreaList.append((Scale-AreaList[9])/Scale*100)
+    AreaList.append(nDodecane*(CC['a'][0]*intList[0]/intList[-1]+CC['b'][0]))
+    AreaList.append(nDodecane*(CC['a'][1]*intList[1]/intList[-1]+CC['b'][1]))
+    AreaList.append(nDodecane*(CC['a'][3+b]*intList[3+b]/intList[-1]+CC['b'][3+b]))
+      
+    AreaList.append(intList[3]/intList[-1])
+               
+    AreaList.append(AreaList[1]/Scale)
+    AreaList.append((Scale-AreaList[3])/Scale*100)
 
     
     data = data + [AreaList]
@@ -67,7 +75,7 @@ for i in files:
 
     
 data = pd.DataFrame(data)
-data.columns=['Name','IMeOH','IPhenol','IPhenylFormate','IDodecane','iMystery','MethylFormate','nMeOH','nPhenol','nPhenylFormate','yMeOH','Conversion']
+data.columns=['Name','MeOH','MethylFormate','Ester','iMyster/iDodecane','yMeOH','Conversion']
 print(data)
 plt.show()
 
